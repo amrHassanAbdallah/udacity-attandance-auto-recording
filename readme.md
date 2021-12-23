@@ -1,4 +1,4 @@
-# Udacity Attandance auto filler
+# Udacity attandance auto recording
 
 A script built on top of puppeteer to automate recording the students attendance for a specific group.
 
