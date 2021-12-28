@@ -103,7 +103,7 @@ const puppeteer = require('puppeteer');
 
         //todo click on set attendance and mark persent
         await page.click('[class="Select-placeholder"]')
-        await page.click('div.Select-menu-outer div.Select-option.is-focused')
+        await page.click('div.Select-menu-outer div.Select-option:nth-child(1)')
         if(notFoundPart.length > 0){
             console.log(`there are ${notFoundPart.length} out of ${participants.length} participants that didn't match over udacity `,notFoundPart)
         }
