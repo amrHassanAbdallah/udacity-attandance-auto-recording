@@ -45,7 +45,7 @@ async function getParticipantsFromZoom(page) {
 
 (async () => {
     config.CheckRequiredFields()
-    const browser = await puppeteer.launch({headless: false});
+    const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
     await page.setViewport({width: 1366, height: 768});
     await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.0 Safari/537.36")
@@ -101,6 +101,26 @@ async function getParticipantsFromZoom(page) {
 
     }
 
+    for (let i = 0; i < config.retryAttendanceConfirmationTimes; i++) {
+        await markStudentsAsPersent(page);
+        await sleep((Math.floor(Math.random() * 11) + 1) * 100);
+    }
+    if (notFoundPart.length > 0) {
+        console.log(`there are ${notFoundPart.length} out of ${participants.length} participants that didn't match over udacity `, notFoundPart)
+    }
+
+
+    await browser.close();
+
+})();
+
+async function sleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms)
+    })
+}
+
+async function markStudentsAsPersent(page) {
     await page.click('[class="Select-placeholder"]')
     let passedOptionId = await page.evaluate(() => {
         document.querySelector("div.vds-text-input input").value = ""
@@ -115,20 +135,12 @@ async function getParticipantsFromZoom(page) {
         return passedOption.id;
     });
     await page.click("#" + passedOptionId)
-    if (notFoundPart.length > 0) {
-        console.log(`there are ${notFoundPart.length} out of ${participants.length} participants that didn't match over udacity `, notFoundPart)
-    }
 
-    await browser.close();
-
-})();
-
+}
 
 function getAttendanceWeekValue(date) {
     date = new Date(date)
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 
     return `${monthNames[date.getMonth()]} ${date.getDate() + nth(date.getDate())}`

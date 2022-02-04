@@ -3,6 +3,7 @@ let config = {
     zoom:{loginURL:"https://zoom.us/signin",reportsURL:"https://zoom.us/account/my/report"},
     udacity:{loginURL:""},
     attendanceDate :args['attendance-day'] ,
+    retryAttendanceConfirmationTimes: 3,
     CheckRequiredFields (){
         const requiredKeys = ["zoom","udacity"]
         for (const key of requiredKeys) {
