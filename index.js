@@ -45,7 +45,7 @@ async function getParticipantsFromZoom(page) {
 
 (async () => {
     config.CheckRequiredFields()
-    const browser = await puppeteer.launch({headless: true});
+    const browser = await puppeteer.launch({headless: false});
     const page = await browser.newPage();
     await page.setViewport({width: 1366, height: 768});
     await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4691.0 Safari/537.36")
@@ -101,16 +101,21 @@ async function getParticipantsFromZoom(page) {
 
     }
 
-    for (let i = 0; i < config.retryAttendanceConfirmationTimes; i++) {
-        await markStudentsAsPersent(page);
-        await sleep((Math.floor(Math.random() * 11) + 1) * 100);
+    try {
+        for (let i = 0; i < config.retryAttendanceConfirmationTimes; i++) {
+            await markStudentsAsPersent(page);
+            await sleep((Math.floor(Math.random() * 11) + 1) * 200);
+        }
+    } catch (error) {
+        console.log("couldn't retry more due to ",error)
     }
+
     if (notFoundPart.length > 0) {
         console.log(`there are ${notFoundPart.length} out of ${participants.length} participants that didn't match over udacity `, notFoundPart)
     }
 
 
-    await browser.close();
+     await browser.close();
 
 })();
 
