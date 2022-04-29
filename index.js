@@ -74,6 +74,28 @@ async function bulkParticipantsSelection (page, participants) {
   return notFoundPart
 }
 
+async function bulkSelectUsingSearch (notFoundPart, page) {
+  for (let i = 0; i < notFoundPart.length; i++) {
+    let participant = notFoundPart[i]
+    await page.type('div.vds-text-input input', participant.name)
+    let isFound = await page.evaluate(() => {
+      let input = document.querySelector('section table td:nth-child(1) input')
+      if (input && !input.checked) {
+        document.querySelector('section table td:nth-child(1) input').click()
+        return true
+      }
+      return false
+    })
+    if (isFound) {
+      delete notFoundPart[i]
+    }
+    await page.evaluate(() => {
+      document.querySelector('div.vds-text-input input').value = ''
+    })
+    await page.waitForTimeout(30)
+  }
+}
+
 (async () => {
   config.CheckRequiredFields()
   const browser = await puppeteer.launch({ headless: false })
@@ -110,6 +132,7 @@ async function bulkParticipantsSelection (page, participants) {
   })
 
   let notFoundPart = await bulkParticipantsSelection(page, participants)
+  await bulkSelectUsingSearch(notFoundPart, page)
 
   await markStudentsAsPersent(page)
 
@@ -124,7 +147,6 @@ async function bulkParticipantsSelection (page, participants) {
   await browser.close()
 
 })()
-
 
 async function markStudentsAsPersent (page) {
   await page.click('[class="Select-placeholder"]')
