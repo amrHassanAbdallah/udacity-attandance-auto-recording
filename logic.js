@@ -1,6 +1,6 @@
 async function getParticipantsFromZoom (config, page) {
-  await page.goto(config.GetZoomLoginURL(),
-    { waitUntil: 'networkidle0', timeout: 60000 })
+  await page.goto(config.GetZoomLoginURL())
+  await page.waitForSelector('div.signin button')
   await page.type('#email', config.GetZoomEmail())
   await page.type('#password', config.GetZoomPassword())
   await page.click('div.signin button')
@@ -95,8 +95,9 @@ async function bulkSelectUsingSearch (notFoundPart, page) {
 }
 
 async function UdacityFlow (config, page, participants) {
-  await page.goto(config.GetUdacityLoginURL(),
-    { waitUntil: 'networkidle0', timeout: 60000 })
+  await page.goto(config.GetUdacityLoginURL())
+  await page.waitForSelector("div[data-testid='signin-form'] button")
+
   await page.type('#email', config.GetUdacityEmail())
   await page.type('#revealable-password', config.GetUdacityPassword())
   await page.click('div[data-testid] button')
