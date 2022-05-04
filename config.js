@@ -8,7 +8,7 @@ let config = {
         const requiredKeys = ["zoom","udacity"]
         for (const key of requiredKeys) {
             if (typeof this[key].EMAIL == "undefined") {
-                
+
                 throw `${key.toUpperCase()}_EMAIL is required as env variable`
             }
             if (typeof this[key].PASSWORD == "undefined") {
@@ -16,6 +16,30 @@ let config = {
             }
         }
 
+    },
+    GetZoomLoginURL() {
+       return this.zoom.loginURL
+    },
+    GetZoomReportsURL() {
+        return this.zoom.reportsURL
+    },
+    GetZoomEmail(){
+        return this.zoom.EMAIL
+    },
+    GetZoomPassword() {
+        return this.zoom.PASSWORD
+    },
+    GetUdacityLoginURL(){
+        return this.udacity.loginURL
+    },
+    GetUdacityEmail(){
+        return this.udacity.EMAIL
+    },
+    GetUdacityPassword(){
+       return this.udacity.PASSWORD
+    },
+    GetAttendanceDay(){
+        return this.attendanceDate
     }
 }
 if(typeof config.attendanceDate == "undefined"){
