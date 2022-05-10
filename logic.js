@@ -127,8 +127,8 @@ async function UdacityFlow (config, page, participants) {
   console.table(participants)
   if (notFoundPart.length > 0) {
     console.log(
-      `there are ${notFoundPart.length} out of ${participants.length} participants that didn't match over udacity `,
-      notFoundPart)
+      `there are ${notFoundPart.length} out of ${participants.length} participants that didn't match over udacity `)
+    console.table(notFoundPart)
   }
 }
 
