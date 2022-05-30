@@ -96,7 +96,7 @@ async function bulkSelectUsingSearch (notFoundPart, page) {
 
 async function UdacityFlow (config, page, participants) {
   await page.goto(config.GetUdacityLoginURL())
-  await page.waitForSelector("div[data-testid='signin-form'] button")
+  await page.waitForSelector('div[data-testid=\'signin-form\'] button')
 
   await page.type('#email', config.GetUdacityEmail())
   await page.type('#revealable-password', config.GetUdacityPassword())
