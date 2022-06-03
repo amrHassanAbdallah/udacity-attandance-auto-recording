@@ -14,8 +14,8 @@ let config = {
     this.attendanceDate = attendanceDate
     this.zoom.EMAIL = zoomEmail
     this.zoom.PASSWORD = zoomPassword
-    this.udacity.email = udacityEmail
-    this.udacity.password = udacityPassword
+    this.udacity.EMAIL = udacityEmail
+    this.udacity.PASSWORD = udacityPassword
     this.udacity.loginURL = udacityLoginURL
   },
   GetZoomLoginURL () {

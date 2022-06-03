@@ -16,8 +16,7 @@ async function getParticipantsFromZoom (page, config) {
   //get the report data
   await page.goto(
     config.GetZoomReportsURL() +
-    getReportsParamsArgs(config.GetAttendanceDay()),
-    { waitUntil: 'networkidle0' })
+    getReportsParamsArgs(config.GetAttendanceDay()))
   try {
     await page.waitForSelector('a[data-attendees]')
   } catch (error) {
