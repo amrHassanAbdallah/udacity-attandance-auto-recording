@@ -1,11 +1,18 @@
-async function getParticipantsFromZoom (config, page) {
-  await page.goto(config.GetZoomLoginURL())
-  await page.waitForSelector('div.signin button')
-  await page.type('#email', config.GetZoomEmail())
-  await page.type('#password', config.GetZoomPassword())
-  await page.click('div.signin button')
-  await page.waitForSelector('#app')
-  //console.log(await page.evaluate(() => navigator.userAgent));
+async function loginIntoZoom (page, config) {
+  try {
+    await page.goto(config.GetZoomLoginURL())
+    await page.waitForSelector('div.signin button')
+    await page.type('#email', config.GetZoomEmail())
+    await page.type('#password', config.GetZoomPassword())
+    await page.click('div.signin button')
+    await page.waitForSelector('#app')
+  }catch (e) {
+    console.log(e)
+    throw new Error("Failed to login to zoom, make sure that you entered valid credentials")
+  }
+}
+
+async function getParticipantsFromZoom (page, config) {
   //get the report data
   await page.goto(
     config.GetZoomReportsURL() +
@@ -14,9 +21,9 @@ async function getParticipantsFromZoom (config, page) {
   try {
     await page.waitForSelector('a[data-attendees]')
   } catch (error) {
-    console.log('No records found in this \'' + config.GetAttendanceDay() +
+    console.log(e)
+    throw new error('No zoom participants records found in this \'' + config.GetAttendanceDay() +
       '\' date, or the page took too long to load.')
-    process.exit(1)
   }
   await page.click(`a[data-attendees]`)
   await page.waitForSelector('div.modal-body table tr:nth-child(2)')
@@ -72,7 +79,7 @@ async function bulkParticipantsSelection (page, participants) {
   return notFoundPart
 }
 
-async function bulkSelectUsingSearch (notFoundPart, page) {
+async function bulkSelectUsingSearch (page, notFoundPart) {
   for (let i = 0; i < notFoundPart.length; i++) {
     let participant = notFoundPart[i]
     await page.type('div.vds-text-input input', participant.name)
@@ -94,42 +101,47 @@ async function bulkSelectUsingSearch (notFoundPart, page) {
   }
 }
 
-async function UdacityFlow (config, page, participants) {
-  await page.goto(config.GetUdacityLoginURL())
-  await page.waitForSelector('div[data-testid=\'signin-form\'] button')
+async function loginIntoUdacity (page, config) {
+  try {
+    await page.goto(config.GetUdacityLoginURL())
+    await page.waitForSelector('div[data-testid=\'signin-form\'] button')
 
-  await page.type('#email', config.GetUdacityEmail())
-  await page.type('#revealable-password', config.GetUdacityPassword())
-  await page.click('div[data-testid] button')
+    await page.type('#email', config.GetUdacityEmail())
+    await page.type('#revealable-password', config.GetUdacityPassword())
+    await page.click('div[data-testid] button')
 
-  await page.waitForTimeout(3000)
+    await page.waitForTimeout(3000)
 
-  await page.waitForSelector('[class^=session-info-header_info]')
-  await page.waitForSelector('div.vds-text-input input')
-
-  //document.querySelector(".Select-menu-outer div[aria-label='December 14th']")
-  console.log(config.GetAttendanceDay())
-  await page.click('div.Select-control')
-  await page.click(`.Select-menu-outer div[aria-label='${getAttendanceWeekValue(
-    config.GetAttendanceDay())}']`)
-
-  await page.evaluate(() => {
-    document.querySelector('div.vds-text-input input').
-      scrollIntoView({ block: 'end' })
-  })
-
-  let notFoundPart = await bulkParticipantsSelection(page, participants)
-  await bulkSelectUsingSearch(notFoundPart, page)
-
-  await markStudentsAsPersent(page)
-
-  console.log(`total participants: ${participants.length}`)
-  console.table(participants)
-  if (notFoundPart.length > 0) {
-    console.log(
-      `there are ${notFoundPart.length} out of ${participants.length} participants that didn't match over udacity `)
-    console.table(notFoundPart)
+    await page.waitForSelector('[class^=session-info-header_info]')
+    await page.waitForSelector('div.vds-text-input input')
+  }catch (e){
+    console.log(e)
+    throw new Error("Failed to login to udacity, make sure that you entered valid credentials")
   }
+}
+
+async function fillAttendance (page, config, participants) {
+  try {
+    console.log(config.GetAttendanceDay())
+    await page.click('div.Select-control')
+    await page.click(`.Select-menu-outer div[aria-label='${getAttendanceWeekValue(
+      config.GetAttendanceDay())}']`)
+
+    await page.evaluate(() => {
+      document.querySelector('div.vds-text-input input').
+        scrollIntoView({ block: 'end' })
+    })
+
+    let notFoundPart = await bulkParticipantsSelection(page, participants)
+    await bulkSelectUsingSearch(page,notFoundPart)
+
+    await markStudentsAsPersent(page)
+    return notFoundPart
+  }catch (e) {
+    console.log(e)
+    throw new Error("Failed to fill the attendance")
+  }
+
 }
 
 async function pageSetup (page) {
@@ -197,6 +209,8 @@ const nth = function (d) {
 
 module.exports = {
   pageSetup,
+  loginIntoZoom,
   getParticipantsFromZoom,
-  UdacityFlow,
+  loginIntoUdacity,
+  fillAttendance,
 }
