@@ -103,16 +103,20 @@ async function bulkSelectUsingSearch (page, notFoundPart) {
 async function loginIntoUdacity (page, config) {
   try {
     await page.goto(config.GetUdacityLoginURL())
-    await page.waitForSelector('div[data-testid=\'signin-form\'] button')
-
-    await page.type('#email', config.GetUdacityEmail())
-    await page.type('#revealable-password', config.GetUdacityPassword())
-    await page.click('div[data-testid] button')
-
     await page.waitForTimeout(3000)
+    const isAlreadyLoggedIn = await page.evaluate(() => {
+      return document.querySelector('div[data-testid=\'signin-form\'] button') == null
+    })
+    if (!isAlreadyLoggedIn){
+      await page.type('#email', config.GetUdacityEmail())
+      await page.type('#revealable-password', config.GetUdacityPassword())
+      await page.click('div[data-testid] button')
 
-    await page.waitForSelector('[class^=session-info-header_info]')
-    await page.waitForSelector('div.vds-text-input input')
+      await page.waitForTimeout(3000)
+
+      await page.waitForSelector('[class^=session-info-header_info]')
+      await page.waitForSelector('div.vds-text-input input')
+    }
   }catch (e){
     console.log(e)
     throw new Error("Failed to login to udacity, make sure that you entered valid credentials")
