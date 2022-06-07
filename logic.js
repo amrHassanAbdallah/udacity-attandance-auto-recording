@@ -3,7 +3,7 @@ async function loginIntoZoom (page, config) {
     await page.goto(config.GetZoomLoginURL())
     await page.waitForTimeout(3000)
     const isAlreadyLoggedIn = await page.evaluate(() => {
-      return document.querySelector('#app') == null
+      return document.querySelector('#email') == null
     })
     if (!isAlreadyLoggedIn){
       await page.waitForSelector('div.signin button')
