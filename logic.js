@@ -26,8 +26,8 @@ async function getParticipantsFromZoom (page, config) {
   try {
     await page.waitForSelector('a[data-attendees]')
   } catch (error) {
-    console.log(e)
-    throw new error('No zoom participants records found in this \'' + config.GetAttendanceDay() +
+    console.log(error)
+    throw new Error('No zoom participants records found in this \'' + config.GetAttendanceDay() +
       '\' date, or the page took too long to load.')
   }
   await page.click(`a[data-attendees]`)
