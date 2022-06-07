@@ -1,11 +1,17 @@
 async function loginIntoZoom (page, config) {
   try {
     await page.goto(config.GetZoomLoginURL())
-    await page.waitForSelector('div.signin button')
-    await page.type('#email', config.GetZoomEmail())
-    await page.type('#password', config.GetZoomPassword())
-    await page.click('div.signin button')
-    await page.waitForSelector('#app')
+    await page.waitForTimeout(3000)
+    const isAlreadyLoggedIn = await page.evaluate(() => {
+      return document.querySelector('#app') == null
+    })
+    if (!isAlreadyLoggedIn){
+      await page.waitForSelector('div.signin button')
+      await page.type('#email', config.GetZoomEmail())
+      await page.type('#password', config.GetZoomPassword())
+      await page.click('div.signin button')
+      await page.waitForSelector('#app')
+    }
   }catch (e) {
     console.log(e)
     throw new Error("Failed to login to zoom, make sure that you entered valid credentials")
