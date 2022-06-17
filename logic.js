@@ -90,15 +90,15 @@ async function bulkSelectUsingSearch (page, notFoundPart) {
     await page.type('div.vds-text-input input', participant.name)
     let isFound = await page.evaluate(() => {
       let input = document.querySelector('section table td:nth-child(1) input')
-      if (input && !input.checked) {
-        document.querySelector('section table td:nth-child(1) input').click()
+      if (input) {
+        if (!input.checked) {
+          document.querySelector('section table td:nth-child(1) input').click()
+        }
         return true
       }
       return false
     })
-    if (isFound) {
-      delete notFoundPart[i]
-    }
+
     await page.evaluate(() => {
       document.querySelector('div.vds-text-input input').value = ''
     })
