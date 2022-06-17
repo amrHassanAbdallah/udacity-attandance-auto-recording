@@ -45,7 +45,7 @@ async function getParticipantsFromZoom (page, config) {
     for (let i = 1; i < rows.length; i++) {
       let cells = rows[i].cells
       let participant = {
-        name: cells[0].innerText.toLowerCase(),
+        name: cells[0].innerText.toLowerCase().replace(/[&\/\\#,+()$~%!.„'":*‚^_¤?<>|@ª{«»§}©®™ ]/g, ' '),
         email: cells[1].innerText,
         duration: cells[2].innerText,
       }
