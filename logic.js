@@ -5,16 +5,17 @@ async function loginIntoZoom (page, config) {
     const isAlreadyLoggedIn = await page.evaluate(() => {
       return document.querySelector('#email') == null
     })
-    if (!isAlreadyLoggedIn){
+    if (!isAlreadyLoggedIn) {
       await page.waitForSelector('div.signin button')
       await page.type('#email', config.GetZoomEmail())
       await page.type('#password', config.GetZoomPassword())
       await page.click('div.signin button')
       await page.waitForSelector('#app')
     }
-  }catch (e) {
+  } catch (e) {
     console.log(e)
-    throw new Error("Failed to login to zoom, make sure that you entered valid credentials")
+    throw new Error(
+      'Failed to login to zoom, make sure that you entered valid credentials')
   }
 }
 
@@ -27,7 +28,8 @@ async function getParticipantsFromZoom (page, config) {
     await page.waitForSelector('a[data-attendees]')
   } catch (error) {
     console.log(error)
-    throw new Error('No zoom participants records found in this \'' + config.GetAttendanceDay() +
+    throw new Error('No zoom participants records found in this \'' +
+      config.GetAttendanceDay() +
       '\' date, or the page took too long to load.')
   }
   await page.click(`a[data-attendees]`)
@@ -45,7 +47,8 @@ async function getParticipantsFromZoom (page, config) {
     for (let i = 1; i < rows.length; i++) {
       let cells = rows[i].cells
       let participant = {
-        name: cells[0].innerText.toLowerCase().replace(/[&\/\\#,+()$~%!.„'":*‚^_¤?<>|@ª{«»§}©®™ ]/g, ' '),
+        name: cells[0].innerText.toLowerCase().
+          replace(/[&\/\\#,+()$~%!.„'":*‚^_¤?<>|@ª{«»§}©®™ ]/g, ' '),
         email: cells[1].innerText,
         duration: cells[2].innerText,
       }
@@ -85,6 +88,7 @@ async function bulkParticipantsSelection (page, participants) {
 }
 
 async function bulkSelectUsingSearch (page, notFoundPart) {
+  let notFound = []
   for (let i = 0; i < notFoundPart.length; i++) {
     let participant = notFoundPart[i]
     await page.type('div.vds-text-input input', participant.name)
@@ -98,12 +102,16 @@ async function bulkSelectUsingSearch (page, notFoundPart) {
       }
       return false
     })
+    if (!isFound) {
+      notFound.push(participant)
+    }
 
     await page.evaluate(() => {
       document.querySelector('div.vds-text-input input').value = ''
     })
     await page.waitForTimeout(30)
   }
+  return notFound
 }
 
 async function loginIntoUdacity (page, config) {
@@ -111,9 +119,10 @@ async function loginIntoUdacity (page, config) {
     await page.goto(config.GetUdacityLoginURL())
     await page.waitForTimeout(3000)
     const isAlreadyLoggedIn = await page.evaluate(() => {
-      return document.querySelector('div[data-testid=\'signin-form\'] button') == null
+      return document.querySelector(
+        'div[data-testid=\'signin-form\'] button') == null
     })
-    if (!isAlreadyLoggedIn){
+    if (!isAlreadyLoggedIn) {
       await page.type('#email', config.GetUdacityEmail())
       await page.type('#revealable-password', config.GetUdacityPassword())
       await page.click('div[data-testid] button')
@@ -123,9 +132,10 @@ async function loginIntoUdacity (page, config) {
       await page.waitForSelector('[class^=session-info-header_info]')
       await page.waitForSelector('div.vds-text-input input')
     }
-  }catch (e){
+  } catch (e) {
     console.log(e)
-    throw new Error("Failed to login to udacity, make sure that you entered valid credentials")
+    throw new Error(
+      'Failed to login to udacity, make sure that you entered valid credentials')
   }
 }
 
@@ -133,8 +143,9 @@ async function fillAttendance (page, config, participants) {
   try {
     console.log(config.GetAttendanceDay())
     await page.click('div.Select-control')
-    await page.click(`.Select-menu-outer div[aria-label='${getAttendanceWeekValue(
-      config.GetAttendanceDay())}']`)
+    await page.click(
+      `.Select-menu-outer div[aria-label='${getAttendanceWeekValue(
+        config.GetAttendanceDay())}']`)
 
     await page.evaluate(() => {
       document.querySelector('div.vds-text-input input').
@@ -142,13 +153,13 @@ async function fillAttendance (page, config, participants) {
     })
 
     let notFoundPart = await bulkParticipantsSelection(page, participants)
-    await bulkSelectUsingSearch(page,notFoundPart)
+    notFoundPart = await bulkSelectUsingSearch(page, notFoundPart)
 
     await markStudentsAsPersent(page)
     return notFoundPart
-  }catch (e) {
+  } catch (e) {
     console.log(e)
-    throw new Error("Failed to fill the attendance")
+    throw new Error('Failed to fill the attendance')
   }
 
 }
