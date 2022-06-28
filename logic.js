@@ -181,6 +181,7 @@ async function markStudentsAsPersent (page) {
       if (option.innerText === 'Present') {
         console.log(option)
         passedOption = option
+        break
       }
     }
     return passedOption.id
