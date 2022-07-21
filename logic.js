@@ -32,7 +32,12 @@ async function getParticipantsFromZoom (page, config) {
       config.GetAttendanceDay() +
       '\' date, or the page took too long to load.')
   }
-  await page.click(`a[data-attendees]`)
+  //get last meeting
+  let lastMeeting = await page.evaluate(() => {
+    let allMeetingsPart = document.querySelectorAll("a[data-attendees]")
+    return allMeetingsPart[allMeetingsPart.length-1].getAttribute("data-id")
+  })
+  await page.click(`a[data-id="${lastMeeting}"]`)
   await page.waitForSelector('div.modal-body table tr:nth-child(2)')
 
   await page.evaluate(() => {
